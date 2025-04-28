@@ -26,7 +26,7 @@ void showMenu() {
     printf("a. 輸出直角三角形\n");
     printf("b. 顯示乘法表\n");
     printf("c. 結束\n");
-    printf("------------------------\n");
+    printf("********\n");
 }
 
 // 產生依字母排列的直角三角形
