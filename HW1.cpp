@@ -53,7 +53,7 @@ int main() {
     } else if (input_char >= '0' && input_char <= '9') {
         printf("\nDigit\n");
     } else {
-        printf("\n班級: 電機1B 座號: 42 姓名: 張竣翔\n");
+        printf("\n班級: 電機1B  座號: 42 姓名: 張竣翔\n");
     }
     
     printf("\n按任意鍵結束...");
