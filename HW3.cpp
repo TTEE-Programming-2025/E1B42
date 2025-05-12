@@ -1,5 +1,3 @@
-#define SIZE 9
-#define PASSWORD "2025"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,7 +10,7 @@ void showStyledScreen() {
     printf("*                                      *\n");
     printf("*          WELCOME TO THE APP          *\n");
     printf("*                                      *\n");
-    printf("*        Developed by [DO DO ]      *\n");
+    printf("*        Developed by [DO DO]      *\n");
     printf("*                                      *\n");
     printf("*        Secure Access Required        *\n");
     printf("*                                      *\n");
@@ -24,6 +22,16 @@ void showStyledScreen() {
     }
 
     printf("========================================\n");
+}
+
+// Function to display the main menu
+void showMainMenu() {
+    printf("----------[Booking System]----------\n");
+    printf("| a. Available seats                |\n");
+    printf("| b. Arrange for you                |\n");
+    printf("| c. Choose by yourself             |\n");
+    printf("| d. Exit                           |\n");
+    printf("------------------------------------\n");
 }
 
 int main() {
@@ -42,8 +50,17 @@ int main() {
         // Check if password is correct
         if (strcmp(input, PASSWORD) == 0) {
             printf("\nAccess granted. Welcome!\n");
-            // Proceed to the next step here
-            printf(">>> Proceeding to the next step...\n");
+
+            // Clear the screen (use "cls" on Windows, "clear" on Unix/Linux/Mac)
+            #ifdef _WIN32
+                system("cls");
+            #else
+                system("clear");
+            #endif
+
+            // Display main menu
+            showMainMenu();
+            // You can add menu interaction logic here later
             return 0;  // Exit successfully
         } else {
             attempts++;
@@ -55,7 +72,6 @@ int main() {
     printf("\nWARNING: Too many incorrect attempts. Exiting system.\n");
     return 1;  // Exit with error
 }
-
 
 
 
