@@ -1,30 +1,74 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <ctype.h>
 
-#define PASSWORD "2025"  // Default 4-digit password
+#define PASSWORD "2025"
+#define ROWS 9
+#define COLS 9
 
-// Function to display a personalized styled screen (at least 20 lines)
+char seats[ROWS][COLS];
+
+void clearScreen() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
+
+void pauseAndReturn() {
+    printf("Press Enter to return to menu...");
+    getchar();
+    clearScreen();
+}
+
+void initSeats() {
+    memset(seats, '-', sizeof(seats));
+    srand(time(NULL));
+    int count = 0;
+    while (count < 10) {
+        int r = rand() % ROWS;
+        int c = rand() % COLS;
+        if (seats[r][c] == '-') {
+            seats[r][c] = '*';
+            count++;
+        }
+    }
+}
+
+void displaySeats() {
+    printf(" \\123456789\n");
+    for (int i = ROWS - 1; i >= 0; i--) {
+        printf("%d", i + 1);
+        for (int j = 0; j < COLS; j++) {
+            printf("%c", seats[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int isValid(int r, int c) {
+    return r >= 0 && r < ROWS && c >= 0 && c < COLS && seats[r][c] == '-';
+}
+
 void showStyledScreen() {
     printf("========================================\n");
     printf("*                                      *\n");
     printf("*          WELCOME TO THE APP          *\n");
     printf("*                                      *\n");
-    printf("*        Developed by [DO DO]      *\n");
+    printf("*        Developed by [DO DO]          *\n");
     printf("*                                      *\n");
     printf("*        Secure Access Required        *\n");
     printf("*                                      *\n");
     printf("========================================\n");
-    
-    // Print 12 additional custom lines to make total lines at least 20
     for (int i = 0; i < 12; i++) {
         printf("*        Personal Style Line %2d        *\n", i + 1);
     }
-
     printf("========================================\n");
 }
 
-// Function to display the main menu
 void showMainMenu() {
     printf("----------[Booking System]----------\n");
     printf("| a. Available seats                |\n");
@@ -34,43 +78,146 @@ void showMainMenu() {
     printf("------------------------------------\n");
 }
 
-int main() {
-    char input[100];     // Buffer to store user input
-    int attempts = 0;    // Counter for wrong attempts
+void handleOptionA() {
+    displaySeats();
+    pauseAndReturn();
+}
 
-    // Show styled welcome screen
+void suggestSeats(int n) {
+    int found = 0;
+    for (int i = 0; i < ROWS && !found; i++) {
+        for (int j = 0; j <= COLS - n; j++) {
+            int ok = 1;
+            for (int k = 0; k < n; k++) {
+                if (seats[i][j + k] != '-') {
+                    ok = 0;
+                    break;
+                }
+            }
+            if (ok) {
+                for (int k = 0; k < n; k++) seats[i][j + k] = '@';
+                found = 1;
+                break;
+            }
+        }
+    }
+    if (!found && n == 4) {
+        for (int i = 0; i < ROWS - 1 && !found; i++) {
+            for (int j = 0; j < COLS; j++) {
+                if (isValid(i, j) && isValid(i + 1, j) && isValid(i, j + 1) && isValid(i + 1, j + 1)) {
+                    seats[i][j] = seats[i + 1][j] = seats[i][j + 1] = seats[i + 1][j + 1] = '@';
+                    found = 1;
+                    break;
+                }
+            }
+        }
+    }
+    if (found) {
+        displaySeats();
+        printf("Do you accept these seats? (y/n): ");
+        char ch;
+        scanf(" %c", &ch); getchar();
+        if (tolower(ch) == 'y') {
+            for (int i = 0; i < ROWS; i++)
+                for (int j = 0; j < COLS; j++)
+                    if (seats[i][j] == '@') seats[i][j] = '*';
+        } else {
+            for (int i = 0; i < ROWS; i++)
+                for (int j = 0; j < COLS; j++)
+                    if (seats[i][j] == '@') seats[i][j] = '-';
+        }
+    } else {
+        printf("No available suggestion.\n");
+    }
+    pauseAndReturn();
+}
+
+void handleOptionB() {
+    int n;
+    printf("How many seats (1-4) do you need? ");
+    scanf("%d", &n); getchar();
+    if (n < 1 || n > 4) {
+        printf("Invalid number.\n");
+        pauseAndReturn();
+        return;
+    }
+    suggestSeats(n);
+}
+
+void handleOptionC() {
+    char input[20];
+    int r, c;
+    while (1) {
+        printf("Enter seat (row-col) or 'done': ");
+        fgets(input, sizeof(input), stdin);
+        if (strncmp(input, "done", 4) == 0) break;
+        if (sscanf(input, "%d-%d", &r, &c) == 2 && r >= 1 && r <= 9 && c >= 1 && c <= 9) {
+            if (seats[r - 1][c - 1] == '-') {
+                seats[r - 1][c - 1] = '@';
+            } else {
+                printf("Seat already booked.\n");
+            }
+        } else {
+            printf("Invalid input.\n");
+        }
+    }
+    displaySeats();
+    pauseAndReturn();
+    for (int i = 0; i < ROWS; i++)
+        for (int j = 0; j < COLS; j++)
+            if (seats[i][j] == '@') seats[i][j] = '*';
+}
+
+void handleOptionD() {
+    char ch;
+    printf("Continue? (y/n): ");
+    scanf(" %c", &ch); getchar();
+    if (tolower(ch) == 'y') {
+        clearScreen();
+    } else if (tolower(ch) == 'n') {
+        printf("Exiting program.\n");
+        exit(0);
+    } else {
+        printf("Invalid input.\n");
+        handleOptionD();
+    }
+}
+
+int main() {
+    char input[100];
+    int attempts = 0;
+
+    initSeats();
     showStyledScreen();
 
-    // Allow up to 3 attempts for correct password
     while (attempts < 3) {
         printf("Enter 4-digit password: ");
-        fgets(input, sizeof(input), stdin);                  // Read input from user
-        input[strcspn(input, "\n")] = '\0';                  // Remove newline character
+        fgets(input, sizeof(input), stdin);
+        input[strcspn(input, "\n")] = '\0';
 
-        // Check if password is correct
         if (strcmp(input, PASSWORD) == 0) {
             printf("\nAccess granted. Welcome!\n");
-
-            // Clear the screen (use "cls" on Windows, "clear" on Unix/Linux/Mac)
-            #ifdef _WIN32
-                system("cls");
-            #else
-                system("clear");
-            #endif
-
-            // Display main menu
-            showMainMenu();
-            // You can add menu interaction logic here later
-            return 0;  // Exit successfully
+            clearScreen();
+            while (1) {
+                showMainMenu();
+                printf("Choose option: ");
+                fgets(input, sizeof(input), stdin);
+                switch (tolower(input[0])) {
+                    case 'a': handleOptionA(); break;
+                    case 'b': handleOptionB(); break;
+                    case 'c': handleOptionC(); break;
+                    case 'd': handleOptionD(); break;
+                    default: printf("Invalid option.\n");
+                }
+            }
         } else {
             attempts++;
             printf("Incorrect password! You have %d attempt(s) left.\n", 3 - attempts);
         }
     }
 
-    // If 3 incorrect attempts, show warning and exit
     printf("\nWARNING: Too many incorrect attempts. Exiting system.\n");
-    return 1;  // Exit with error
+    return 1;
 }
 
 
