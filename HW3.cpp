@@ -219,6 +219,10 @@ int main() {
     printf("\nWARNING: Too many incorrect attempts. Exiting system.\n");
     return 1;
 }
+// 心得：
+// 透過這次座位預約系統的設計，讓我更加熟悉C語言中的陣列、流程控制與使用者互動，
+// 並學會如何結合邏輯與隨機性來模擬實際應用情境，是一次非常實用的練習。
+// 加上用英文註解又更難了 
 
 
 
