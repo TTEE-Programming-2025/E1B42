@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 // 假設學生資料結構與陣列來自其他檔案
 extern Student students[];
@@ -15,37 +14,37 @@ void clear_screen() {
 #endif
 }
 
-// 搜尋學生成績的函式
-void search_student_grades() {
+// 排名顯示函式
+void show_grade_ranking() {
     clear_screen();
 
-    char search_name[50];
-    int found = 0;
+    printf("=== Grade Ranking (by Average) ===\n");
 
-    printf("=== Search Student Grades ===\n");
-    printf("Enter student name: ");
-    scanf("%s", search_name); // 讀入欲搜尋的姓名
-
+    // 建立學生資料的複製陣列以避免更動原資料
+    Student sorted[MAX_STUDENTS];
     for (int i = 0; i < student_count; i++) {
-        if (strcmp(students[i].name, search_name) == 0) {
-            // 找到學生，顯示資料
-            printf("\nStudent Found:\n");
-            printf("Name   : %s\n", students[i].name);
-            printf("ID     : %d\n", students[i].id);
-            printf("Math   : %d\n", students[i].math);
-            printf("Physics: %d\n", students[i].physics);
-            printf("English: %d\n", students[i].english);
-            printf("Average: %.1f\n", students[i].average);
-            found = 1;
-            break;
+        sorted[i] = students[i];
+    }
+
+    // 使用簡單的泡沫排序法根據平均成績排序（降冪）
+    for (int i = 0; i < student_count - 1; i++) {
+        for (int j = 0; j < student_count - i - 1; j++) {
+            if (sorted[j].average < sorted[j + 1].average) {
+                Student temp = sorted[j];
+                sorted[j] = sorted[j + 1];
+                sorted[j + 1] = temp;
+            }
         }
     }
 
-    if (!found) {
-        printf("\nNo student found with the name \"%s\".\n", search_name);
+    // 顯示排序後的結果
+    printf("\n%-10s %-10s %-10s\n", "Name", "ID", "Average");
+    for (int i = 0; i < student_count; i++) {
+        printf("%-10s %-10d %-10.1f\n",
+               sorted[i].name, sorted[i].id, sorted[i].average);
     }
 
     printf("\nPress Enter to return to the menu...\n");
-    getchar(); getchar(); // 暫停等待
+    getchar(); getchar();
 }
 
