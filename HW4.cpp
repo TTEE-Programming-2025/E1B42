@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-// 假設結構與全域陣列已在其他檔案中定義
+// 假設學生資料結構與陣列來自其他檔案
 extern Student students[];
 extern int student_count;
 
-// 清除螢幕（和其他檔案共用）
+// 清除螢幕函式
 void clear_screen() {
 #ifdef _WIN32
     system("cls");
@@ -14,29 +15,37 @@ void clear_screen() {
 #endif
 }
 
-// 顯示所有學生成績的函式
-void display_student_grades() {
+// 搜尋學生成績的函式
+void search_student_grades() {
     clear_screen();
 
-    printf("Student Grades\n");
-    printf("-----------------------------------------------------\n");
-    printf("Name\tID\t  Math\tPhysics\tEnglish\tAverage\n");
-    printf("-----------------------------------------------------\n");
+    char search_name[50];
+    int found = 0;
+
+    printf("=== Search Student Grades ===\n");
+    printf("Enter student name: ");
+    scanf("%s", search_name); // 讀入欲搜尋的姓名
 
     for (int i = 0; i < student_count; i++) {
-        printf("%s\t%d\t  %3d\t  %3d\t  %3d\t  %.1f\n",
-            students[i].name,
-            students[i].id,
-            students[i].math,
-            students[i].physics,
-            students[i].english,
-            students[i].average);
+        if (strcmp(students[i].name, search_name) == 0) {
+            // 找到學生，顯示資料
+            printf("\nStudent Found:\n");
+            printf("Name   : %s\n", students[i].name);
+            printf("ID     : %d\n", students[i].id);
+            printf("Math   : %d\n", students[i].math);
+            printf("Physics: %d\n", students[i].physics);
+            printf("English: %d\n", students[i].english);
+            printf("Average: %.1f\n", students[i].average);
+            found = 1;
+            break;
+        }
     }
 
-    printf("-----------------------------------------------------\n");
-    printf("Press Enter to return to the menu...\n");
-    getchar(); getchar(); // 確保輸入可見
+    if (!found) {
+        printf("\nNo student found with the name \"%s\".\n", search_name);
+    }
+
+    printf("\nPress Enter to return to the menu...\n");
+    getchar(); getchar(); // 暫停等待
 }
-
-
 
