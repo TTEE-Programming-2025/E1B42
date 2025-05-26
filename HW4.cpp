@@ -1,10 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define PASSWORD 2025
-#define MAX_TRIES 3
+#define MAX_STUDENTS 10
 
-// 清除螢幕函式
+// 學生資料結構
+typedef struct {
+    char name[50];
+    int id;
+    int math;
+    int physics;
+    int english;
+    float average;
+} Student;
+
+Student students[MAX_STUDENTS];  // 全域陣列儲存學生資料
+int student_count = 0;
+
+// 清除螢幕
 void clear_screen() {
 #ifdef _WIN32
     system("cls");
@@ -13,67 +26,63 @@ void clear_screen() {
 #endif
 }
 
-// 顯示個人風格畫面
-void show_intro_screen() {
+// 讓使用者輸入成績的函式
+void enter_student_grades() {
     clear_screen();
-    printf("=============================================\n");
-    for (int i = 0; i < 20; i++) {
-        printf("*    Welcome to [Your Name]'s Grade System   *\n");
+    int n;
+
+    printf("Enter number of students (5 to 10): ");
+    scanf("%d", &n);
+
+    // 驗證學生人數
+    while (n < 5 || n > 10) {
+        printf("Invalid input. Please enter between 5 and 10: ");
+        scanf("%d", &n);
     }
-    printf("=============================================\n");
-}
 
-// 密碼驗證函式
-int verify_password() {
-    int input, tries = 0;
+    student_count = n;
 
-    while (tries < MAX_TRIES) {
-        printf("Please enter the 4-digit password: ");
-        scanf("%d", &input);
+    // 輸入每位學生的資料
+    for (int i = 0; i < n; i++) {
+        printf("\n[Student %d]\n", i + 1);
 
-        if (input == PASSWORD) {
-            printf("Correct password! Access granted.\n");
-            return 1;
-        } else {
-            printf("Incorrect password. Please try again.\n");
-            tries++;
+        printf("Name: ");
+        scanf("%s", students[i].name);
+
+        printf("Student ID (6-digit number): ");
+        scanf("%d", &students[i].id);
+        while (students[i].id < 100000 || students[i].id > 999999) {
+            printf("Invalid ID. Enter a 6-digit number: ");
+            scanf("%d", &students[i].id);
         }
+
+        printf("Math score (0~100): ");
+        scanf("%d", &students[i].math);
+        while (students[i].math < 0 || students[i].math > 100) {
+            printf("Invalid score. Re-enter (0~100): ");
+            scanf("%d", &students[i].math);
+        }
+
+        printf("Physics score (0~100): ");
+        scanf("%d", &students[i].physics);
+        while (students[i].physics < 0 || students[i].physics > 100) {
+            printf("Invalid score. Re-enter (0~100): ");
+            scanf("%d", &students[i].physics);
+        }
+
+        printf("English score (0~100): ");
+        scanf("%d", &students[i].english);
+        while (students[i].english < 0 || students[i].english > 100) {
+            printf("Invalid score. Re-enter (0~100): ");
+            scanf("%d", &students[i].english);
+        }
+
+        // 計算平均成績
+        students[i].average = (students[i].math + students[i].physics + students[i].english) / 3.0f;
     }
 
-    printf("Too many failed attempts. System locked.\n");
-    return 0;
-}
-
-// 顯示主選單
-void show_menu() {
-    clear_screen();
-    printf("------------[Grade System]-------------\n");
-    printf("| a. Enter student grades             |\n");
-    printf("| b. Display student grades           |\n");
-    printf("| c. Search for student grades        |\n");
-    printf("| d. Grade ranking                    |\n");
-    printf("| e. Exit system                      |\n");
-    printf("---------------------------------------\n");
-}
-
-// 主程式
-int main() {
-    show_intro_screen();
-
-    if (!verify_password()) {
-        return 0;
-    }
-
-    show_menu();
-
-    char choice;
-    printf("Select an option: ");
-    scanf(" %c", &choice);  // 等待使用者輸入選項
-
-    printf("You selected option: %c\n", choice);
-    // 接下來可以根據選項進入下一題的功能
-
-    return 0;
+    printf("\nAll student data has been entered. Press Enter to return to menu...\n");
+    getchar(); getchar();  // 等待使用者按任意鍵
 }
 
 
